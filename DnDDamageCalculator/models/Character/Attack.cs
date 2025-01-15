@@ -21,7 +21,8 @@ public record Attack(
         return missResults.Concat(critResult).Concat(hitResults).ToArray();
     }
 
-    private (AttackResult[] missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult> critResults) ProcessBasicAttack(CombatConfiguration combatConfiguration)
+    private (IEnumerable<AttackResult> missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult>
+        critResults) ProcessBasicAttack(CombatConfiguration combatConfiguration)
     {
         var necessaryRollToHit = combatConfiguration.targetAC - AttackMod;
         var necessaryRollToCrit = int.Max(CritRange, necessaryRollToHit);
@@ -67,7 +68,7 @@ public record Attack(
             }
         }
 
-        AttackResult[] missResults =
+        List<AttackResult> missResults =
         [
             new AttackResult([HitResult.Miss], [], CalculateMissDamage(Mastery), percToMiss * AttackPerc,
                 combatConfiguration.effects with { Vexed = [false] }),
@@ -88,7 +89,11 @@ public record Attack(
             new AttackResult([HitResult.NonAttack], [], 0,
                 percToCrit * (1 - AttackPerc), new AttackEffects())
         ]);
-        return (missResults, hitResults, critResults);
+        return (
+            missResults.Where(result => result.Probability > 0),
+            hitResults.Where(result => result.Probability > 0),
+            critResults.Where(result => result.Probability > 0)
+        );
     }
 
     private static bool AttackHasAdvantage(CombatConfiguration configuration)
