@@ -23,7 +23,7 @@ public record Attack(
     private (IEnumerable<AttackResult> missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult>
         critResults) ProcessBasicAttack(CombatConfiguration combatConfiguration)
     {
-        var necessaryRollToHit = combatConfiguration.targetAC - AttackMod;
+        var necessaryRollToHit = combatConfiguration.TargetAc - AttackMod;
         var necessaryRollToCrit = int.Max(CritRange, necessaryRollToHit);
 
         var d20Distribution = AttackHasAdvantage(combatConfiguration)
@@ -70,9 +70,9 @@ public record Attack(
         List<AttackResult> missResults =
         [
             new AttackResult([HitResult.Miss], [], CalculateMissDamage(Mastery), percToMiss * AttackPerc,
-                combatConfiguration.effects with { Vexed = [false] }),
+                combatConfiguration.Effects with { Vexed = [false] }),
             new AttackResult([HitResult.NonAttack], [], CalculateMissDamage(Mastery), percToMiss * (1 - AttackPerc),
-                combatConfiguration.effects with { Vexed = [false] })
+                combatConfiguration.Effects with { Vexed = [false] })
         ];
         var hitResults = GenerateWeaponMasteryResults(
             new AttackResult([HitResult.Hit], WeaponDamage, DamageMod, percToHit * AttackPerc,
@@ -97,9 +97,9 @@ public record Attack(
 
     private static bool AttackHasAdvantage(CombatConfiguration configuration)
     {
-        return configuration.hasAdvantageOnAttacks
-               || configuration.effects.Toppled.LastOrDefault()
-               || configuration.effects.Vexed.LastOrDefault();
+        return configuration.HasAdvantageOnAttacks
+               || configuration.Effects.Toppled.LastOrDefault()
+               || configuration.Effects.Vexed.LastOrDefault();
     }
 
     private static int CalculateMissDamage(IWeaponMastery? mastery)

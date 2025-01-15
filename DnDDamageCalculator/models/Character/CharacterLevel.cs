@@ -23,7 +23,7 @@ public record CharacterLevel(int LevelNumber, Attack[] Attacks, CharacterFeature
                 pair =>
                     pair.newResults.Select(newScenario =>
                         (AggregateConsecutiveAttacks(pair.previousScenario, newScenario),
-                            initialCombatConfiguration with { effects = newScenario.AttackEffects })
+                            initialCombatConfiguration with { Effects = newScenario.AttackEffects })
                     )
             );
         }

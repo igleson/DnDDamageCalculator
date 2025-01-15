@@ -1,3 +1,3 @@
 namespace DnDDamageCalculator.Models.Combat;
 
-public record CombatConfiguration(int targetAC, AttackEffects effects, bool hasAdvantageOnAttacks = false);
+public record CombatConfiguration(int TargetAc, AttackEffects Effects, bool HasAdvantageOnAttacks = false);
