@@ -12,7 +12,7 @@ public record Attack(
     IWeaponMastery? Mastery = null
 )
 {
-    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, Feat[] feats)
+    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CheracterFeature[] feats)
     {
         var necessaryRollToHit = combatConfiguration.targetAC - AttackMod;
         var necessaryRollToCrit = int.Max(CritRange, necessaryRollToHit);
@@ -133,12 +133,12 @@ public record Attack(
         };
     }
 
-    private static AttackResult[] ProcessFeats(AttackResult result, Feat[] feats)
+    private static AttackResult[] ProcessFeats(AttackResult result, CheracterFeature[] feats)
     {
         if (feats.Length == 0) return [result];
-        return feats.SelectMany<Feat, AttackResult>(feat => feat switch
+        return feats.SelectMany<CheracterFeature, AttackResult>(feat => feat switch
         {
-            ShieldMaster { TopplePerc: var perc } when !result.AttackEffects.HasShieldMasterBeenUsed() &&
+            ShieldMasterFeat { TopplePerc: var perc } when !result.AttackEffects.HasShieldMasterBeenUsed() &&
                                                        !result.AttackEffects.EnemyIsCurrentlyToppled() =>
             [
                 result with

@@ -73,8 +73,8 @@ var lvl4 = new CharacterLevel(4, attacksLevel4, []);
 var lvl5 = new CharacterLevel(5, attacksLevel5, []);
 var lvl6 = new CharacterLevel(6, attacksLevel6, []);
 var lvl7 = new CharacterLevel(7, attacksLevel6, []);
-var lvl8 = new CharacterLevel(8, attacksLevel8, [new ShieldMaster(0.5)]);
-var lvl9 = new CharacterLevel(9, attacksLevel8, [new ShieldMaster(0.5)]);
+var lvl8 = new CharacterLevel(8, attacksLevel8, [new ShieldMasterFeat(0.5)]);
+var lvl9 = new CharacterLevel(9, attacksLevel8, [new ShieldMasterFeat(0.5)]);
 
 var character = new Character([
     lvl1,
