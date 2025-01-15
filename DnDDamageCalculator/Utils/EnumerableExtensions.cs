@@ -1,5 +1,3 @@
-using DnDDamageCalculator.Models;
-
 namespace DnDDamageCalculator.Utils;
 
 public static class EnumerableExtensions
@@ -14,18 +12,5 @@ public static class EnumerableExtensions
                 from item in sequence
                 select accseq.Concat(new[] { item })
         );
-    }
-
-    public static IEnumerable<AttackResult> AggregateSimilarResults(
-        this IEnumerable<AttackResult> scenarios)
-    {
-        return scenarios
-            .GroupBy(scenario => scenario.HitHistory)
-            .Select(groupedScenarios =>
-                new AttackResult(
-                    groupedScenarios.Key,
-                    groupedScenarios.SelectMany(scenario => scenario.DamageDices),
-                    groupedScenarios.Select(scenario => scenario.DamageModifier).Sum(),
-                    groupedScenarios.Sum(scenario => scenario.Probability)));
     }
 }

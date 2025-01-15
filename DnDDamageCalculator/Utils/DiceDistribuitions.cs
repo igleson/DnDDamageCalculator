@@ -112,11 +112,11 @@ public static class DiceDistributions
         (4, 0.25)
     ];
 
-    public static double PercentageOfHigherThanInDistribution(this Dice distribution, int value)
+    public static double AverageDamage(this Dice die)
     {
-        return distribution.SkipWhile(dice => dice.value < value).Select(dice => dice.probability).Sum();
+        return die.Select(dice => dice.value * dice.probability).Sum();
     }
-
+    
     public static string DiesString(this IEnumerable<Dice> dies)
     {
         var groupedBySides = dies.GroupBy(die => die.Count());

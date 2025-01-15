@@ -5,31 +5,30 @@ namespace DnDDamageCalculator.Models.Character;
 
 public record CharacterLevel(int levelNumber, Attack[] attacks)
 {
-    public AttackResult[] GenerateResults(CombatConfiguration combatConfiguration)
+    public AttackResult[] GenerateResults(CombatConfiguration initialCombatConfiguration)
     {
-        IEnumerable<AttackResult> currentScenarios = [AttackResult.Initial];
+        IEnumerable<(AttackResult previousResult, CombatConfiguration configuration)> currentScenarios =
+            [(AttackResult.Initial, initialCombatConfiguration)];
 
         foreach (var attack in attacks)
         {
             var newScenariosPair =
                 currentScenarios
-                    .Select<AttackResult, (AttackResult previousScenario,
-                        IEnumerable<AttackResult> newScenarios
-                        )>(previousScenarios =>
-                    {
-                        //Generate a new combatConfiguration based on the currentScenarios
-                        return (previousScenarios, attack.GenerateAttackResults(combatConfiguration));
-                    });
+                    .Select<(AttackResult previousScenario, CombatConfiguration configuration), (AttackResult
+                        previousScenario,
+                        IEnumerable<AttackResult> newResults
+                        )>(pair => (pair.previousScenario, attack.GenerateAttackResults(pair.configuration)));
 
             currentScenarios = newScenariosPair.SelectMany(
                 pair =>
-                    pair.newScenarios.Select(newScenario =>
-                        AggregateConsecutiveAttacks(pair.previousScenario, newScenario)
+                    pair.newResults.Select(newScenario =>
+                        (AggregateConsecutiveAttacks(pair.previousScenario, newScenario),
+                            initialCombatConfiguration with { effects = newScenario.EnemyEffects })
                     )
             );
         }
 
-        return currentScenarios
+        return currentScenarios.Select(pair => pair.previousResult)
             .ToArray();
     }
 
@@ -37,12 +36,22 @@ public record CharacterLevel(int levelNumber, Attack[] attacks)
         AttackResult scenario1,
         AttackResult scenario2)
     {
-        var newProbability = scenario1.Probability * scenario2.Probability;
+        return scenario2 with
+        {
+            HitHistory = scenario1.HitHistory.Concat(scenario2.HitHistory),
+            DamageDices = scenario1.DamageDices.Concat(scenario2.DamageDices),
+            DamageModifier = scenario1.DamageModifier + scenario2.DamageModifier,
+            Probability = scenario1.Probability * scenario2.Probability,
+            EnemyEffects = AggregateEffects(scenario1.EnemyEffects, scenario2.EnemyEffects)
+        };
+    }
 
-        return new AttackResult(
-            scenario1.HitHistory.Concat(scenario2.HitHistory),
-            scenario1.DamageDices.Concat(scenario2.DamageDices),
-            scenario1.DamageModifier + scenario2.DamageModifier,
-            newProbability);
+    private static EnemyEffects AggregateEffects(EnemyEffects effects1, EnemyEffects effects2)
+    {
+        return new EnemyEffects
+        {
+            Toppled = effects1.Toppled.Concat(effects2.Toppled),
+            Vexed = effects1.Vexed.Concat(effects2.Vexed)
+        };
     }
 }
