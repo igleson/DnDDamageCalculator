@@ -3,7 +3,7 @@ using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models.Character;
 
-public record CharacterLevel(int LevelNumber, Attack[] Attacks, CheracterFeature[] Feats)
+public record CharacterLevel(int LevelNumber, Attack[] Attacks, CharacterFeature[] Feats)
 {
     public AttackResult[] GenerateResults(CombatConfiguration initialCombatConfiguration)
     {
@@ -54,8 +54,8 @@ public record CharacterLevel(int LevelNumber, Attack[] Attacks, CheracterFeature
     }
 }
 
-public interface CheracterFeature;
+public interface CharacterFeature;
 
-public record ShieldMasterFeat(double TopplePerc) : CheracterFeature;
+public record ShieldMasterFeat(double TopplePerc) : CharacterFeature;
 
-public record HeroicWarriorFeature : CheracterFeature;
+public record HeroicWarriorFeature : CharacterFeature;

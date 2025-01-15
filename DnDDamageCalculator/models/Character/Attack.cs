@@ -12,7 +12,7 @@ public record Attack(
     IWeaponMastery? Mastery = null
 )
 {
-    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CheracterFeature[] features)
+    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CharacterFeature[] features)
     {
         var (missResults, hitResults, critResult) = ProcessBasicAttack(combatConfiguration);
 
@@ -141,21 +141,27 @@ public record Attack(
         };
     }
 
-    private static AttackResult[] ProcessFeatures(AttackResult result, CheracterFeature[] features)
+    private static IEnumerable<AttackResult> ProcessFeature(AttackResult result, CharacterFeature feature)
     {
-        if (features.Length == 0) return [result];
-        return features.SelectMany<CheracterFeature, AttackResult>(feat => feat switch
+        return feature switch
         {
             ShieldMasterFeat { TopplePerc: var perc } when result.LastAttackIsHit() &&
                                                            !result.AttackEffects.HasShieldMasterBeenUsed() &&
                                                            !result.AttackEffects.EnemyIsCurrentlyToppled() =>
-                ProccessShieldMasterFeat(result, perc),
-            HeroicWarriorFeature => [],
+                ProcessShieldMasterFeat(result, perc),
             _ => [result]
-        }).ToArray();
+        };
     }
 
-    private static IEnumerable<AttackResult> ProccessShieldMasterFeat(AttackResult result, double perc)
+    private static IEnumerable<AttackResult> ProcessFeatures(AttackResult result, CharacterFeature[] features)
+    {
+        if (features.Length == 0) return [result];
+
+        return features.Aggregate<CharacterFeature, IEnumerable<AttackResult>>([result],
+            (results, feature) => results.SelectMany(res => ProcessFeature(res, feature)));
+    }
+
+    private static IEnumerable<AttackResult> ProcessShieldMasterFeat(AttackResult result, double perc)
     {
         return
         [
