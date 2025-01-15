@@ -11,7 +11,7 @@ public struct Character(CharacterLevel[] levels)
             .Select(tuple =>
             {
                 var (combatConfiguration, level) = tuple;
-                return (level.levelNumber, level.GenerateResults(combatConfiguration));
+                return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration));
             }).ToArray();
     }
 }

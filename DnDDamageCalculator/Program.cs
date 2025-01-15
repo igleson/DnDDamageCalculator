@@ -57,13 +57,24 @@ Attack[] attacksLevel6 =
     new Attack(6, [DiceDistributions.D10], 4+2, 19, 0.5, new Topple(0.60)), //reaction attack
 ];
 
-var lvl1 = new CharacterLevel(1, attacksLevel1);
-var lvl2 = new CharacterLevel(2, attacksLevel2);
-var lvl3 = new CharacterLevel(3, attacksLevel3);
-var lvl4 = new CharacterLevel(4, attacksLevel4);
-var lvl5 = new CharacterLevel(5, attacksLevel5);
-var lvl6 = new CharacterLevel(6, attacksLevel6);
-var lvl7 = new CharacterLevel(7, attacksLevel6);
+Attack[] attacksLevel8 =
+[
+    new Attack(7, [DiceDistributions.D10], 5+2, 19, 1, new Topple(0.60)), //attack action
+    new Attack(7, [DiceDistributions.D10], 5+2, 19, 1, new Topple(0.60)), //attack action
+    new Attack(7, [DiceDistributions.D10], 5+2, 19, 0.75, new Topple(0.60)), //ba attack
+    new Attack(7, [DiceDistributions.D10], 5+2, 19, 0.125, new Topple(0.60)), //action surge attack
+    new Attack(7, [DiceDistributions.D10], 5+2, 19, 0.5, new Topple(0.60)), //reaction attack
+];
+
+var lvl1 = new CharacterLevel(1, attacksLevel1, []);
+var lvl2 = new CharacterLevel(2, attacksLevel2, []);
+var lvl3 = new CharacterLevel(3, attacksLevel3, []);
+var lvl4 = new CharacterLevel(4, attacksLevel4, []);
+var lvl5 = new CharacterLevel(5, attacksLevel5, []);
+var lvl6 = new CharacterLevel(6, attacksLevel6, []);
+var lvl7 = new CharacterLevel(7, attacksLevel6, []);
+var lvl8 = new CharacterLevel(8, attacksLevel8, [new ShieldMaster(0.5)]);
+var lvl9 = new CharacterLevel(9, attacksLevel8, [new ShieldMaster(0.5)]);
 
 var character = new Character([
     lvl1,
@@ -72,18 +83,22 @@ var character = new Character([
     lvl4,
     lvl5,
     lvl6,
-    lvl7
+    lvl7,
+    lvl8,
+    lvl9
 ]);
 
 var scenariosByLevel = character.GenerateResults(
 [
-    new CombatConfiguration(14, new EnemyEffects()),
-    new CombatConfiguration(14, new EnemyEffects()),
-    new CombatConfiguration(14, new EnemyEffects()),
-    new CombatConfiguration(15, new EnemyEffects()),    
-    new CombatConfiguration(15, new EnemyEffects()),    
-    new CombatConfiguration(15, new EnemyEffects()),    
-    new CombatConfiguration(15, new EnemyEffects()),    
+    new CombatConfiguration(14, new AttackEffects()),
+    new CombatConfiguration(14, new AttackEffects()),
+    new CombatConfiguration(14, new AttackEffects()),
+    new CombatConfiguration(15, new AttackEffects()),    
+    new CombatConfiguration(15, new AttackEffects()),    
+    new CombatConfiguration(15, new AttackEffects()),    
+    new CombatConfiguration(15, new AttackEffects()),    
+    new CombatConfiguration(16, new AttackEffects()),    
+    new CombatConfiguration(16, new AttackEffects()),    
 ]);
 
 foreach (var (level, scenarios) in scenariosByLevel)

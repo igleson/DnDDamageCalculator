@@ -3,27 +3,27 @@ using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models.Character;
 
-public record CharacterLevel(int levelNumber, Attack[] attacks)
+public record CharacterLevel(int LevelNumber, Attack[] Attacks, Feat[] Feats)
 {
     public AttackResult[] GenerateResults(CombatConfiguration initialCombatConfiguration)
     {
         IEnumerable<(AttackResult previousResult, CombatConfiguration configuration)> currentScenarios =
             [(AttackResult.Initial, initialCombatConfiguration)];
 
-        foreach (var attack in attacks)
+        foreach (var attack in Attacks)
         {
             var newScenariosPair =
                 currentScenarios
                     .Select<(AttackResult previousScenario, CombatConfiguration configuration), (AttackResult
                         previousScenario,
                         IEnumerable<AttackResult> newResults
-                        )>(pair => (pair.previousScenario, attack.GenerateAttackResults(pair.configuration)));
+                        )>(pair => (pair.previousScenario, attack.GenerateAttackResults(pair.configuration, Feats)));
 
             currentScenarios = newScenariosPair.SelectMany(
                 pair =>
                     pair.newResults.Select(newScenario =>
                         (AggregateConsecutiveAttacks(pair.previousScenario, newScenario),
-                            initialCombatConfiguration with { effects = newScenario.EnemyEffects })
+                            initialCombatConfiguration with { effects = newScenario.AttackEffects })
                     )
             );
         }
@@ -36,22 +36,24 @@ public record CharacterLevel(int levelNumber, Attack[] attacks)
         AttackResult scenario1,
         AttackResult scenario2)
     {
-        return scenario2 with
-        {
-            HitHistory = scenario1.HitHistory.Concat(scenario2.HitHistory),
-            DamageDices = scenario1.DamageDices.Concat(scenario2.DamageDices),
-            DamageModifier = scenario1.DamageModifier + scenario2.DamageModifier,
-            Probability = scenario1.Probability * scenario2.Probability,
-            EnemyEffects = AggregateEffects(scenario1.EnemyEffects, scenario2.EnemyEffects)
-        };
+        return new AttackResult(
+            HitHistory: scenario1.HitHistory.Concat(scenario2.HitHistory),
+            DamageDices: scenario1.DamageDices.Concat(scenario2.DamageDices),
+            DamageModifier: scenario1.DamageModifier + scenario2.DamageModifier,
+            Probability: scenario1.Probability * scenario2.Probability,
+            AttackEffects: AggregateEffects(scenario1.AttackEffects, scenario2.AttackEffects));
     }
 
-    private static EnemyEffects AggregateEffects(EnemyEffects effects1, EnemyEffects effects2)
+    private static AttackEffects AggregateEffects(AttackEffects effects1, AttackEffects effects2)
     {
-        return new EnemyEffects
+        return new AttackEffects
         {
             Toppled = effects1.Toppled.Concat(effects2.Toppled),
             Vexed = effects1.Vexed.Concat(effects2.Vexed)
         };
     }
 }
+
+public interface Feat;
+
+public record ShieldMaster(double TopplePerc) : Feat;

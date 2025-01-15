@@ -12,7 +12,7 @@ public record Attack(
     IWeaponMastery? Mastery = null
 )
 {
-    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration)
+    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, Feat[] feats)
     {
         var necessaryRollToHit = combatConfiguration.targetAC - AttackMod;
         var necessaryRollToCrit = int.Max(CritRange, necessaryRollToHit);
@@ -67,19 +67,22 @@ public record Attack(
         ];
         var hitResults =
             GenerateWeaponMasteryResults(
-                new AttackResult([HitResult.Hit], WeaponDamage, DamageMod, percToHit * AttackPerc, new EnemyEffects()),
-                Mastery).Concat(
-            [
-                new AttackResult([HitResult.NonAttack], [], 0, percToHit * (1 - AttackPerc), new EnemyEffects())
-            ]);
+                    new AttackResult([HitResult.Hit], WeaponDamage, DamageMod, percToHit * AttackPerc,
+                        new AttackEffects()),
+                    Mastery).Concat(
+                [
+                    new AttackResult([HitResult.NonAttack], [], 0, percToHit * (1 - AttackPerc), new AttackEffects())
+                ])
+                .SelectMany(result => ProcessFeats(result, feats));
         var critResult =
             GenerateWeaponMasteryResults(
-                new AttackResult([HitResult.CriticalHit], WeaponDamage.Concat(WeaponDamage), DamageMod,
-                    percToCrit * AttackPerc, new EnemyEffects()), Mastery).Concat(
-            [
-                new AttackResult([HitResult.NonAttack], [], 0,
-                    percToCrit * (1 - AttackPerc), new EnemyEffects())
-            ]);
+                    new AttackResult([HitResult.CriticalHit], WeaponDamage.Concat(WeaponDamage), DamageMod,
+                        percToCrit * AttackPerc, new AttackEffects()), Mastery).Concat(
+                [
+                    new AttackResult([HitResult.NonAttack], [], 0,
+                        percToCrit * (1 - AttackPerc), new AttackEffects())
+                ])
+                .SelectMany(result => ProcessFeats(result, feats));
 
         return critResult.Concat(hitResults).Concat(missResults).ToArray();
     }
@@ -111,7 +114,7 @@ public record Attack(
                 result with
                 {
                     Probability = result.Probability * topplePerc,
-                    EnemyEffects = result.EnemyEffects with { Toppled = [true] }
+                    AttackEffects = result.AttackEffects with { Toppled = [true] }
                 },
                 result with
                 {
@@ -123,11 +126,42 @@ public record Attack(
                 result with
                 {
                     Probability = result.Probability,
-                    EnemyEffects = result.EnemyEffects with { Vexed = [true] }
+                    AttackEffects = result.AttackEffects with { Vexed = [true] }
                 }
             ],
             _ => [result]
         };
+    }
+
+    private static AttackResult[] ProcessFeats(AttackResult result, Feat[] feats)
+    {
+        if (feats.Length == 0) return [result];
+        return feats.SelectMany<Feat, AttackResult>(feat => feat switch
+        {
+            ShieldMaster { TopplePerc: var perc } when !result.AttackEffects.ShieldMasterUsed &&
+                                                       !result.AttackEffects.EnemyIsCurrentlyToppled() =>
+            [
+                result with
+                {
+                    Probability = result.Probability * perc,
+                    AttackEffects = result.AttackEffects with
+                    {
+                        Toppled = result.AttackEffects.Toppled.Concat([true]),
+                        ShieldMasterUsed = true
+                    }
+                },
+                result with
+                {
+                    Probability = result.Probability * (1 - perc),
+                    AttackEffects = result.AttackEffects with
+                    {
+                        Toppled = result.AttackEffects.Toppled.Concat([false]),
+                        ShieldMasterUsed = true
+                    }
+                }
+            ],
+            _ => [result]
+        }).ToArray();
     }
 }
 

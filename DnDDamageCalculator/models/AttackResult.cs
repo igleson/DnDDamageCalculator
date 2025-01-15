@@ -3,9 +3,9 @@ using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models;
 
-public record AttackResult(IEnumerable<HitResult> HitHistory, IEnumerable<Dice> DamageDices, int DamageModifier, double Probability, EnemyEffects EnemyEffects)
+public record AttackResult(IEnumerable<HitResult> HitHistory, IEnumerable<Dice> DamageDices, int DamageModifier, double Probability, AttackEffects AttackEffects)
 {
-    public static readonly AttackResult Initial = new([], Enumerable.Empty<Dice>(), 0, 1, new EnemyEffects());
+    public static readonly AttackResult Initial = new([], Enumerable.Empty<Dice>(), 0, 1, new AttackEffects());
 
     public double AverageDamage()
     {
@@ -31,11 +31,15 @@ public enum HitResult
     Miss, Hit, CriticalHit, NonAttack
 }
 
-public record EnemyEffects
+public record AttackEffects
 {
     public IEnumerable<bool> Toppled { get; init; } = [false];
 
     public IEnumerable<bool> Vexed { get; init; } = [false];
+
+    public bool ShieldMasterUsed { get; init; } = false;
+
+    public bool EnemyIsCurrentlyToppled() => Toppled.LastOrDefault();
     
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
