@@ -138,7 +138,7 @@ public record Attack(
         if (feats.Length == 0) return [result];
         return feats.SelectMany<Feat, AttackResult>(feat => feat switch
         {
-            ShieldMaster { TopplePerc: var perc } when !result.AttackEffects.ShieldMasterUsed &&
+            ShieldMaster { TopplePerc: var perc } when !result.AttackEffects.HasShieldMasterBeenUsed() &&
                                                        !result.AttackEffects.EnemyIsCurrentlyToppled() =>
             [
                 result with
@@ -147,7 +147,7 @@ public record Attack(
                     AttackEffects = result.AttackEffects with
                     {
                         Toppled = result.AttackEffects.Toppled.Concat([true]),
-                        ShieldMasterUsed = true
+                        ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
                     }
                 },
                 result with
@@ -156,7 +156,7 @@ public record Attack(
                     AttackEffects = result.AttackEffects with
                     {
                         Toppled = result.AttackEffects.Toppled.Concat([false]),
-                        ShieldMasterUsed = true
+                        ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
                     }
                 }
             ],

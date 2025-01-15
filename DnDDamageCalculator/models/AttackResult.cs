@@ -37,9 +37,11 @@ public record AttackEffects
 
     public IEnumerable<bool> Vexed { get; init; } = [false];
 
-    public bool ShieldMasterUsed { get; init; } = false;
+    public IEnumerable<bool> ShieldMasterUsedHist { get; init; } = [];
 
     public bool EnemyIsCurrentlyToppled() => Toppled.LastOrDefault();
+
+    public bool HasShieldMasterBeenUsed() => ShieldMasterUsedHist.FirstOrDefault(used => used);
     
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
