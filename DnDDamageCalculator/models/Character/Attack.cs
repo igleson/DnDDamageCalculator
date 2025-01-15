@@ -12,13 +12,12 @@ public record Attack(
     IWeaponMastery? Mastery = null
 )
 {
-    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CheracterFeature[] feats)
+    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CheracterFeature[] features)
     {
         var (missResults, hitResults, critResult) = ProcessBasicAttack(combatConfiguration);
-        hitResults = hitResults.SelectMany(result => ProcessFeats(result, feats));
-        critResult = critResult.SelectMany(result => ProcessFeats(result, feats));
 
-        return missResults.Concat(critResult).Concat(hitResults).ToArray();
+        return missResults.Concat(critResult).Concat(hitResults).SelectMany(result => ProcessFeatures(result, features))
+            .ToArray();
     }
 
     private (IEnumerable<AttackResult> missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult>
@@ -142,35 +141,42 @@ public record Attack(
         };
     }
 
-    private static AttackResult[] ProcessFeats(AttackResult result, CheracterFeature[] feats)
+    private static AttackResult[] ProcessFeatures(AttackResult result, CheracterFeature[] features)
     {
-        if (feats.Length == 0) return [result];
-        return feats.SelectMany<CheracterFeature, AttackResult>(feat => feat switch
+        if (features.Length == 0) return [result];
+        return features.SelectMany<CheracterFeature, AttackResult>(feat => feat switch
         {
-            ShieldMasterFeat { TopplePerc: var perc } when !result.AttackEffects.HasShieldMasterBeenUsed() &&
+            ShieldMasterFeat { TopplePerc: var perc } when result.LastAttackIsHit() &&
+                                                           !result.AttackEffects.HasShieldMasterBeenUsed() &&
                                                            !result.AttackEffects.EnemyIsCurrentlyToppled() =>
-            [
-                result with
-                {
-                    Probability = result.Probability * perc,
-                    AttackEffects = result.AttackEffects with
-                    {
-                        Toppled = result.AttackEffects.Toppled.Concat([true]),
-                        ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
-                    }
-                },
-                result with
-                {
-                    Probability = result.Probability * (1 - perc),
-                    AttackEffects = result.AttackEffects with
-                    {
-                        Toppled = result.AttackEffects.Toppled.Concat([false]),
-                        ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
-                    }
-                }
-            ],
+                ProccessShieldMasterFeat(result, perc),
             _ => [result]
         }).ToArray();
+    }
+
+    private static IEnumerable<AttackResult> ProccessShieldMasterFeat(AttackResult result, double perc)
+    {
+        return
+        [
+            result with
+            {
+                Probability = result.Probability * perc,
+                AttackEffects = result.AttackEffects with
+                {
+                    Toppled = result.AttackEffects.Toppled.Concat([true]),
+                    ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
+                }
+            },
+            result with
+            {
+                Probability = result.Probability * (1 - perc),
+                AttackEffects = result.AttackEffects with
+                {
+                    Toppled = result.AttackEffects.Toppled.Concat([false]),
+                    ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
+                }
+            }
+        ];
     }
 }
 

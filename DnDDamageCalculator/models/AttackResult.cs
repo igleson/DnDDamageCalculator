@@ -3,9 +3,17 @@ using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models;
 
-public record AttackResult(IEnumerable<HitResult> HitHistory, IEnumerable<Dice> DamageDices, int DamageModifier, double Probability, AttackEffects AttackEffects)
+public record AttackResult(
+    IEnumerable<HitResult> HitHistory,
+    IEnumerable<Dice> DamageDices,
+    int DamageModifier,
+    double Probability,
+    AttackEffects AttackEffects)
 {
     public static readonly AttackResult Initial = new([], Enumerable.Empty<Dice>(), 0, 1, new AttackEffects());
+
+    public bool LastAttackIsHit() =>
+        HitHistory.Any() && (HitHistory.Last() == HitResult.Hit || HitHistory.Last() == HitResult.CriticalHit);
 
     public double AverageDamage()
     {
@@ -14,9 +22,9 @@ public record AttackResult(IEnumerable<HitResult> HitHistory, IEnumerable<Dice> 
             var a = dice.AverageDamage();
             return a;
         }).Sum();
-        return (diceAverage +DamageModifier)*Probability;
+        return (diceAverage + DamageModifier) * Probability;
     }
-    
+
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
         // stringBuilder.Append($"HitHistory = [{string.Join(',', HitHistory.Select(hit => hit.ToString()))}], ");
@@ -28,7 +36,10 @@ public record AttackResult(IEnumerable<HitResult> HitHistory, IEnumerable<Dice> 
 
 public enum HitResult
 {
-    Miss, Hit, CriticalHit, NonAttack
+    Miss,
+    Hit,
+    CriticalHit,
+    NonAttack
 }
 
 public record AttackEffects
@@ -42,7 +53,7 @@ public record AttackEffects
     public bool EnemyIsCurrentlyToppled() => Toppled.LastOrDefault();
 
     public bool HasShieldMasterBeenUsed() => ShieldMasterUsedHist.FirstOrDefault(used => used);
-    
+
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
         stringBuilder.Append($"Toppled = [{string.Join(',', Toppled.Select(t => t.ToString()))}], ");
