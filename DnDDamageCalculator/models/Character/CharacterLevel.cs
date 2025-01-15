@@ -57,3 +57,5 @@ public record CharacterLevel(int LevelNumber, Attack[] Attacks, CheracterFeature
 public interface CheracterFeature;
 
 public record ShieldMasterFeat(double TopplePerc) : CheracterFeature;
+
+public record HeroicWarriorFeature : CheracterFeature;

@@ -150,6 +150,7 @@ public record Attack(
                                                            !result.AttackEffects.HasShieldMasterBeenUsed() &&
                                                            !result.AttackEffects.EnemyIsCurrentlyToppled() =>
                 ProccessShieldMasterFeat(result, perc),
+            HeroicWarriorFeature => [],
             _ => [result]
         }).ToArray();
     }
