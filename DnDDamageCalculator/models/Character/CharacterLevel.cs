@@ -3,9 +3,9 @@ using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models.Character;
 
-public record CharacterLevel(int LevelNumber, Attack[] Attacks, CharacterFeature[] Feats)
+public record CharacterLevel(int LevelNumber, IEnumerable<Attack> Attacks, IList<CharacterFeature> Features)
 {
-    public AttackResult[] GenerateResults(CombatConfiguration initialCombatConfiguration)
+    public IEnumerable<AttackResult> GenerateResults(CombatConfiguration initialCombatConfiguration)
     {
         IEnumerable<(AttackResult previousResult, CombatConfiguration configuration)> currentScenarios =
             [(AttackResult.Initial, initialCombatConfiguration)];
@@ -17,7 +17,7 @@ public record CharacterLevel(int LevelNumber, Attack[] Attacks, CharacterFeature
                     .Select<(AttackResult previousScenario, CombatConfiguration configuration), (AttackResult
                         previousScenario,
                         IEnumerable<AttackResult> newResults
-                        )>(pair => (pair.previousScenario, attack.GenerateAttackResults(pair.configuration, Feats)));
+                        )>(pair => (pair.previousScenario, attack.GenerateAttackResults(pair.configuration, Features)));
 
             currentScenarios = newScenariosPair.SelectMany(
                 pair =>
@@ -28,8 +28,7 @@ public record CharacterLevel(int LevelNumber, Attack[] Attacks, CharacterFeature
             );
         }
 
-        return currentScenarios.Select(pair => pair.previousResult)
-            .ToArray();
+        return currentScenarios.Select(pair => pair.previousResult);
     }
 
     private static AttackResult AggregateConsecutiveAttacks(

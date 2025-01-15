@@ -28,8 +28,8 @@ public record AttackResult(
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
         // stringBuilder.Append($"HitHistory = [{string.Join(',', HitHistory.Select(hit => hit.ToString()))}], ");
-        stringBuilder.Append($"Damage = {AverageDamage()}");
         // stringBuilder.Append($"EnemyEffects = {EnemyEffects}");
+        stringBuilder.Append($"Damage = {AverageDamage()}");
         return true;
     }
 }
@@ -49,10 +49,14 @@ public record AttackEffects
     public IEnumerable<bool> Vexed { get; init; } = [false];
 
     public IEnumerable<bool> ShieldMasterUsedHist { get; init; } = [];
+    
+    public IEnumerable<bool> HeroicWarriorUsedHist { get; init; } = [];
 
     public bool EnemyIsCurrentlyToppled() => Toppled.LastOrDefault();
 
     public bool HasShieldMasterBeenUsed() => ShieldMasterUsedHist.FirstOrDefault(used => used);
+    
+    public bool HasHeroicWarriorBeenUsed() => HeroicWarriorUsedHist.FirstOrDefault(used => used);
 
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {

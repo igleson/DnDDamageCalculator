@@ -12,12 +12,12 @@ public record Attack(
     IWeaponMastery? Mastery = null
 )
 {
-    public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CharacterFeature[] features)
+    public IEnumerable<AttackResult> GenerateAttackResults(CombatConfiguration combatConfiguration, IList<CharacterFeature> features)
     {
         var (missResults, hitResults, critResult) = ProcessBasicAttack(combatConfiguration);
 
-        return missResults.Concat(critResult).Concat(hitResults).SelectMany(result => ProcessFeatures(result, features))
-            .ToArray();
+        return missResults.Concat(critResult).Concat(hitResults)
+            .SelectMany(result => ProcessFeatures(result, features, combatConfiguration));
     }
 
     private (IEnumerable<AttackResult> missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult>
@@ -112,7 +112,7 @@ public record Attack(
         return 0;
     }
 
-    private static AttackResult[] GenerateWeaponMasteryResults(AttackResult result, IWeaponMastery? mastery)
+    private static IEnumerable<AttackResult> GenerateWeaponMasteryResults(AttackResult result, IWeaponMastery? mastery)
     {
         if (mastery is null) return [result];
         return mastery switch
@@ -141,28 +141,67 @@ public record Attack(
         };
     }
 
-    private static IEnumerable<AttackResult> ProcessFeature(AttackResult result, CharacterFeature feature)
+    private IEnumerable<AttackResult> ProcessFeature(AttackResult result, CharacterFeature feature,
+        CombatConfiguration combatConfiguration)
     {
         return feature switch
         {
-            ShieldMasterFeat { TopplePerc: var perc } when result.LastAttackIsHit() &&
-                                                           !result.AttackEffects.HasShieldMasterBeenUsed() &&
-                                                           !result.AttackEffects.EnemyIsCurrentlyToppled() =>
+            ShieldMasterFeat { TopplePerc: var perc } =>
                 ProcessShieldMasterFeat(result, perc),
+            HeroicWarriorFeature => ProcessHeroicWarriorFeature(result, combatConfiguration),
             _ => [result]
         };
     }
 
-    private static IEnumerable<AttackResult> ProcessFeatures(AttackResult result, CharacterFeature[] features)
+    private IEnumerable<AttackResult> ProcessFeatures(AttackResult result, IList<CharacterFeature> features,
+        CombatConfiguration combatConfiguration)
     {
-        if (features.Length == 0) return [result];
+        if (!features.Any()) return [result];
 
         return features.Aggregate<CharacterFeature, IEnumerable<AttackResult>>([result],
-            (results, feature) => results.SelectMany(res => ProcessFeature(res, feature)));
+            (results, feature) => results.SelectMany(res => ProcessFeature(res, feature, combatConfiguration)));
+    }
+
+    private IEnumerable<AttackResult> ProcessHeroicWarriorFeature(AttackResult result,
+        CombatConfiguration combatConfiguration)
+    {
+        var lastWasHit = result.LastAttackIsHit();
+        var usedHeroicWarrior = result.AttackEffects.HasHeroicWarriorBeenUsed();
+        if (usedHeroicWarrior || lastWasHit)
+        {
+            return
+            [
+                result with
+                {
+                    AttackEffects = result.AttackEffects with
+                    {
+                        HeroicWarriorUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([false])
+                    }
+                }
+            ];
+        }
+
+        var (miss, hit, crit) = ProcessBasicAttack(combatConfiguration);
+        return miss.Concat(hit).Concat(crit).Select(attackResult => attackResult with
+            {
+                Probability = attackResult.Probability * result.Probability,
+                AttackEffects = attackResult.AttackEffects with
+                {
+                    HeroicWarriorUsedHist = attackResult.AttackEffects.ShieldMasterUsedHist.Concat([true]),
+                }
+            }
+        );
     }
 
     private static IEnumerable<AttackResult> ProcessShieldMasterFeat(AttackResult result, double perc)
     {
+        if (!result.LastAttackIsHit() ||
+            result.AttackEffects.HasShieldMasterBeenUsed() ||
+            result.AttackEffects.EnemyIsCurrentlyToppled())
+        {
+            return [result];
+        }
+
         return
         [
             result with

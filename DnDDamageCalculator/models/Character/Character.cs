@@ -2,9 +2,10 @@ using DnDDamageCalculator.Models.Combat;
 
 namespace DnDDamageCalculator.Models.Character;
 
-public struct Character(CharacterLevel[] levels)
+public struct Character(IEnumerable<CharacterLevel> levels)
 {
-    public (int level, AttackResult[])[] GenerateResults(CombatConfiguration[] initialConfigurationByLevel)
+    public IEnumerable<(int level, IEnumerable<AttackResult> results)> GenerateResults(
+        IEnumerable<CombatConfiguration> initialConfigurationByLevel)
     {
         var levelAndTarget = initialConfigurationByLevel.Zip(levels);
         return levelAndTarget
@@ -12,6 +13,6 @@ public struct Character(CharacterLevel[] levels)
             {
                 var (combatConfiguration, level) = tuple;
                 return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration));
-            }).ToArray();
+            });
     }
 }
