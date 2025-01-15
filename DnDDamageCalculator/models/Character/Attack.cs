@@ -14,6 +14,15 @@ public record Attack(
 {
     public AttackResult[] GenerateAttackResults(CombatConfiguration combatConfiguration, CheracterFeature[] feats)
     {
+        var (missResults, hitResults, critResult) = ProcessBasicAttack(combatConfiguration);
+        hitResults = hitResults.SelectMany(result => ProcessFeats(result, feats));
+        critResult = critResult.SelectMany(result => ProcessFeats(result, feats));
+
+        return missResults.Concat(critResult).Concat(hitResults).ToArray();
+    }
+
+    private (AttackResult[] missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult> critResults) ProcessBasicAttack(CombatConfiguration combatConfiguration)
+    {
         var necessaryRollToHit = combatConfiguration.targetAC - AttackMod;
         var necessaryRollToCrit = int.Max(CritRange, necessaryRollToHit);
 
@@ -65,26 +74,21 @@ public record Attack(
             new AttackResult([HitResult.NonAttack], [], CalculateMissDamage(Mastery), percToMiss * (1 - AttackPerc),
                 combatConfiguration.effects with { Vexed = [false] })
         ];
-        var hitResults =
-            GenerateWeaponMasteryResults(
-                    new AttackResult([HitResult.Hit], WeaponDamage, DamageMod, percToHit * AttackPerc,
-                        new AttackEffects()),
-                    Mastery).Concat(
-                [
-                    new AttackResult([HitResult.NonAttack], [], 0, percToHit * (1 - AttackPerc), new AttackEffects())
-                ])
-                .SelectMany(result => ProcessFeats(result, feats));
-        var critResult =
-            GenerateWeaponMasteryResults(
-                    new AttackResult([HitResult.CriticalHit], WeaponDamage.Concat(WeaponDamage), DamageMod,
-                        percToCrit * AttackPerc, new AttackEffects()), Mastery).Concat(
-                [
-                    new AttackResult([HitResult.NonAttack], [], 0,
-                        percToCrit * (1 - AttackPerc), new AttackEffects())
-                ])
-                .SelectMany(result => ProcessFeats(result, feats));
-
-        return critResult.Concat(hitResults).Concat(missResults).ToArray();
+        var hitResults = GenerateWeaponMasteryResults(
+            new AttackResult([HitResult.Hit], WeaponDamage, DamageMod, percToHit * AttackPerc,
+                new AttackEffects()),
+            Mastery).Concat(
+        [
+            new AttackResult([HitResult.NonAttack], [], 0, percToHit * (1 - AttackPerc), new AttackEffects())
+        ]);
+        var critResults = GenerateWeaponMasteryResults(
+            new AttackResult([HitResult.CriticalHit], WeaponDamage.Concat(WeaponDamage), DamageMod,
+                percToCrit * AttackPerc, new AttackEffects()), Mastery).Concat(
+        [
+            new AttackResult([HitResult.NonAttack], [], 0,
+                percToCrit * (1 - AttackPerc), new AttackEffects())
+        ]);
+        return (missResults, hitResults, critResults);
     }
 
     private static bool AttackHasAdvantage(CombatConfiguration configuration)
@@ -139,7 +143,7 @@ public record Attack(
         return feats.SelectMany<CheracterFeature, AttackResult>(feat => feat switch
         {
             ShieldMasterFeat { TopplePerc: var perc } when !result.AttackEffects.HasShieldMasterBeenUsed() &&
-                                                       !result.AttackEffects.EnemyIsCurrentlyToppled() =>
+                                                           !result.AttackEffects.EnemyIsCurrentlyToppled() =>
             [
                 result with
                 {
