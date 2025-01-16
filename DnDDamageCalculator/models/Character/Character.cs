@@ -3,17 +3,13 @@ using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models.Character;
 
-public struct Character(IEnumerable<CharacterLevel> levels)
+public readonly struct CharacterCombat(
+    IEnumerable<(CharacterLevel level, CombatConfiguration combatConfiguration)> levels)
 {
-    public IEnumerable<(int level, IEnumerable<AttackResult> results)> GenerateResults(
-        IEnumerable<CombatConfiguration> initialConfigurationByLevel)
+    public IEnumerable<(int level, IEnumerable<AttackResult> results)> GenerateResults()
     {
-        var levelAndTarget = initialConfigurationByLevel.Zip(levels);
-        return levelAndTarget
-            .Select(tuple =>
-            {
-                var (combatConfiguration, level) = tuple;
-                return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration).AggregateSimilarResult());
-            });
+        return levels
+            .Select(tuple => (tuple.level.LevelNumber,
+                tuple.level.GenerateResults(tuple.combatConfiguration).AggregateSimilarResult()));
     }
 }

@@ -12,115 +12,169 @@ using DnDDamageCalculator.Utils;
 
 Attack[] attacksLevel1 =
 [
-    new Attack(5, new DamageDices(new Dictionary<int, int>{{8, 1}}), 3 + 2, 20, 1)
+    new Attack(5, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 3 + 2, 20, 1)
 ];
 
 Attack[] attacksLevel2 =
 [
-    new Attack(5, new DamageDices(new Dictionary<int, int>{{8, 1}}), 3 + 2, 20, 1, new Topple(0.60)), //attack
-    new Attack(5, new DamageDices(new Dictionary<int, int>{{8, 1}}), 3 + 2, 20, 0.125, new Topple(0.60)) //action surge attack
+    new Attack(5, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 3 + 2, 20, 1, new Topple(0.60)), //attack
+    new Attack(5, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 3 + 2, 20, 0.125,
+        new Topple(0.60)) //action surge attack
 ];
 
 Attack[] attacksLevel3 =
 [
-    new Attack(5, new DamageDices(new Dictionary<int, int>{{8, 1}}), 3 + 2, 19, 1, new Topple(0.60)), //attack
-    new Attack(5, new DamageDices(new Dictionary<int, int>{{8, 1}}), 3 + 2, 19, 0.125, new Topple(0.60)) //action surge attack
+    new Attack(5, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 3 + 2, 19, 1, new Topple(0.60)), //attack
+    new Attack(5, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 3 + 2, 19, 0.125,
+        new Topple(0.60)) //action surge attack
 ];
 
 Attack[] attacksLevel4 =
 [
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{8, 1}}), 4 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{4, 1}}), 4 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{8, 1}}), 4 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{8, 1}}), 4 + 2, 19, 0.25, new Topple(0.60)), //reaction attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 4 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 4 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 4 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 8, 1 } }), 4 + 2, 19, 0.25,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel5 =
 [
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{4, 1}}), 4 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 0.25, new Topple(0.60)), //reaction attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 4 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 0.25,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel6 =
 [
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{4, 1}}), 4 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(6, new DamageDices(new Dictionary<int, int>{{10, 1}}), 4 + 2, 19, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 4 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(6, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 4 + 2, 19, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel8 =
 [
-    new Attack(7, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(7, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(7, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(7, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(7, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(7, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(7, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(7, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(7, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(7, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel9 =
 [
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel10 =
 [
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{10, 1}}), 5 + 2, 19, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 10, 1 } }), 5 + 2, 19, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel11 =
 [
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 19, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 19, 0.75, new Topple(0.60)), //ba attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 19, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 19, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 19, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 19, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 19, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 19, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel15 =
 [
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 18, 0.75, new Topple(0.60)), //ba attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 0.125, new Topple(0.60)), //action surge attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 18, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 18, 0.125,
+        new Topple(0.60)), //action surge attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 12, 1 } }), 5 + 2, 18, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel17 =
 [
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 18, 0.75, new Topple(0.60)), //ba attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 0.25,
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 18, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 0.25,
         new Topple(0.60)), //action surge attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 Attack[] attacksLevel20 =
 [
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 1, new Topple(0.60)), //attack action
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{4, 1}}), 5 + 2, 18, 0.75, new Topple(0.60)), //ba attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 0.25,
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 1,
+        new Topple(0.60)), //attack action
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 4, 1 } }), 5 + 2, 18, 0.75,
+        new Topple(0.60)), //ba attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 0.25,
         new Topple(0.60)), //action surge attack
-    new Attack(9, new DamageDices(new Dictionary<int, int>{{12, 1}}), 5 + 2, 18, 0.5, new Topple(0.60)), //reaction attack
+    new Attack(9, new DamageDices(new Dictionary<int, int> { { 6, 2 } }), 5 + 2, 18, 0.5,
+        new Topple(0.60)), //reaction attack
 ];
 
 var lvl1 = new CharacterLevel(1, attacksLevel1, []);
@@ -134,7 +188,8 @@ var lvl8 = new CharacterLevel(8, attacksLevel8, [new ShieldMasterFeat(0.5)]);
 var lvl9 = new CharacterLevel(9, attacksLevel9, [new ShieldMasterFeat(0.5)]);
 var lvl10 = new CharacterLevel(10, attacksLevel10, [new HeroicWarriorFeature(), new ShieldMasterFeat(0.5)]);
 var lvl11 = new CharacterLevel(11, attacksLevel11, [new HeroicWarriorFeature(), new ShieldMasterFeat(0.5)]);
-var lvl13 = new CharacterLevel(13, attacksLevel11, [new HeroicWarriorFeature(), new StudiedAttacks(), new ShieldMasterFeat(0.5)]);
+var lvl13 = new CharacterLevel(13, attacksLevel11,
+    [new HeroicWarriorFeature(), new StudiedAttacks(), new ShieldMasterFeat(0.5)]);
 var lvl15 = new CharacterLevel(15, attacksLevel15,
     [new HeroicWarriorFeature(), new StudiedAttacks(), new ShieldMasterFeat(0.5)]);
 var lvl17 = new CharacterLevel(17, attacksLevel17,
@@ -144,50 +199,31 @@ var lvl19 = new CharacterLevel(19, attacksLevel17,
 var lvl20 = new CharacterLevel(20, attacksLevel20,
     [new HeroicWarriorFeature(), new BoonOfCombatProwess(), new StudiedAttacks(), new ShieldMasterFeat(0.5)]);
 
-var shilelaghChampion = new Character([
-    lvl1,
-    lvl2,
-    lvl3,
-    lvl4,
-    lvl5,
-    lvl6,
-    lvl7,
-    lvl8,
-    lvl9,
-    lvl10,
-    lvl11,
-    lvl13,
-    lvl15,
-    lvl17,
-    lvl19,
-    lvl20
+var combat1To3 = new CombatConfiguration(14, new AttackEffects());
+var combat4To7 = new CombatConfiguration(15, new AttackEffects());
+var combat8 = new CombatConfiguration(16, new AttackEffects());
+var combat9To20 = new CombatConfiguration(16, new AttackEffects());
+
+var shilelaghChampion = new CharacterCombat([
+    (lvl1, combat1To3),
+    (lvl2, combat1To3),
+    (lvl3, combat1To3),
+    (lvl4, combat4To7),
+    (lvl5, combat4To7),
+    (lvl6, combat4To7),
+    (lvl7, combat4To7),
+    (lvl8, combat8),
+    (lvl9, combat9To20),
+    (lvl10, combat9To20),
+    (lvl11, combat9To20),
+    (lvl13, combat9To20),
+    (lvl15, combat9To20),
+    (lvl17, combat9To20),
+    (lvl19, combat9To20),
+    (lvl20, combat9To20)
 ]);
 
-List<CombatConfiguration> combats =
-[
-    new CombatConfiguration(14, new AttackEffects()), //lvl1
-    new CombatConfiguration(14, new AttackEffects()), //lvl2
-    new CombatConfiguration(14, new AttackEffects()), //lvl3
-    new CombatConfiguration(15, new AttackEffects()), //lvl4
-    new CombatConfiguration(15, new AttackEffects()), //lvl5
-    new CombatConfiguration(15, new AttackEffects()), //lvl6
-    new CombatConfiguration(15, new AttackEffects()), //lvl7
-    new CombatConfiguration(16, new AttackEffects()), //lvl8
-    new CombatConfiguration(18, new AttackEffects()), //lvl9
-    new CombatConfiguration(18, new AttackEffects()), //lvl10
-    new CombatConfiguration(18, new AttackEffects()), //lvl11
-    // new CombatConfiguration(18, new AttackEffects()), //lvl12
-    new CombatConfiguration(18, new AttackEffects()), //lvl13
-    // new CombatConfiguration(18, new AttackEffects()), //lvl14
-    new CombatConfiguration(18, new AttackEffects()), //lvl15
-    new CombatConfiguration(18, new AttackEffects()), //lvl16
-    new CombatConfiguration(18, new AttackEffects()), //lvl17
-    // new CombatConfiguration(18, new AttackEffects()), //lvl18
-    new CombatConfiguration(18, new AttackEffects()), //lvl19
-    new CombatConfiguration(18, new AttackEffects()), //lvl120
-];
-
-var resultsByLevel = shilelaghChampion.GenerateResults(combats);
+var resultsByLevel = shilelaghChampion.GenerateResults();
 
 foreach (var (level, results) in resultsByLevel)
 {
@@ -197,6 +233,7 @@ foreach (var (level, results) in resultsByLevel)
     {
         Console.WriteLine($"{result}");
     }
+
     Console.WriteLine("--------------------------------------------");
 }
 
