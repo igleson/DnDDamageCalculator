@@ -145,61 +145,61 @@ var lvl20 = new CharacterLevel(20, attacksLevel20,
     [new HeroicWarriorFeature(), new BoonOfCombatProwess(), new StudiedAttacks(), new ShieldMasterFeat(0.5)]);
 
 var shilelaghChampion = new Character([
-    // lvl1,
-    // lvl2,
-    // lvl3,
-    // lvl4,
-    // lvl5,
-    // lvl6,
-    // lvl7,
-    // lvl8,
-    // lvl9,
-    // lvl10,
-    // lvl11,
-    // lvl13,
-    // lvl15,
-    // lvl17,
-    // lvl19,
+    lvl1,
+    lvl2,
+    lvl3,
+    lvl4,
+    lvl5,
+    lvl6,
+    lvl7,
+    lvl8,
+    lvl9,
+    lvl10,
+    lvl11,
+    lvl13,
+    lvl15,
+    lvl17,
+    lvl19,
     lvl20
 ]);
 
 List<CombatConfiguration> combats =
 [
-    // new CombatConfiguration(14, new AttackEffects()), //lvl1
-    // new CombatConfiguration(14, new AttackEffects()), //lvl2
-    // new CombatConfiguration(14, new AttackEffects()), //lvl3
-    // new CombatConfiguration(15, new AttackEffects()), //lvl4
-    // new CombatConfiguration(15, new AttackEffects()), //lvl5
-    // new CombatConfiguration(15, new AttackEffects()), //lvl6
-    // new CombatConfiguration(15, new AttackEffects()), //lvl7
-    // new CombatConfiguration(16, new AttackEffects()), //lvl8
-    // new CombatConfiguration(18, new AttackEffects()), //lvl9
-    // new CombatConfiguration(18, new AttackEffects()), //lvl10
-    // new CombatConfiguration(18, new AttackEffects()), //lvl11
+    new CombatConfiguration(14, new AttackEffects()), //lvl1
+    new CombatConfiguration(14, new AttackEffects()), //lvl2
+    new CombatConfiguration(14, new AttackEffects()), //lvl3
+    new CombatConfiguration(15, new AttackEffects()), //lvl4
+    new CombatConfiguration(15, new AttackEffects()), //lvl5
+    new CombatConfiguration(15, new AttackEffects()), //lvl6
+    new CombatConfiguration(15, new AttackEffects()), //lvl7
+    new CombatConfiguration(16, new AttackEffects()), //lvl8
+    new CombatConfiguration(18, new AttackEffects()), //lvl9
+    new CombatConfiguration(18, new AttackEffects()), //lvl10
+    new CombatConfiguration(18, new AttackEffects()), //lvl11
     // new CombatConfiguration(18, new AttackEffects()), //lvl12
-    // new CombatConfiguration(18, new AttackEffects()), //lvl13
+    new CombatConfiguration(18, new AttackEffects()), //lvl13
     // new CombatConfiguration(18, new AttackEffects()), //lvl14
-    // new CombatConfiguration(18, new AttackEffects()), //lvl15
-    // new CombatConfiguration(18, new AttackEffects()), //lvl16
-    // new CombatConfiguration(18, new AttackEffects()), //lvl17
+    new CombatConfiguration(18, new AttackEffects()), //lvl15
+    new CombatConfiguration(18, new AttackEffects()), //lvl16
+    new CombatConfiguration(18, new AttackEffects()), //lvl17
     // new CombatConfiguration(18, new AttackEffects()), //lvl18
-    // new CombatConfiguration(18, new AttackEffects()), //lvl19
+    new CombatConfiguration(18, new AttackEffects()), //lvl19
     new CombatConfiguration(18, new AttackEffects()), //lvl120
 ];
 
 var resultsByLevel = shilelaghChampion.GenerateResults(combats);
 
-var prob = 0.0;
 foreach (var (level, results) in resultsByLevel)
 {
-    foreach (var result in results.AggregateSimilarDamage())
+    var res = results.AggregateSimilarDamage();
+    Console.WriteLine($"---level {level}, total prob {res.Select(r => r.Probability).Sum()}---");
+    foreach (var result in res)
     {
-        prob += result.Probability;
         Console.WriteLine($"{result}");
     }
+    Console.WriteLine("---------------------------------------------");
 }
 
-Console.WriteLine(prob);
 
 // HEX WARLOCK
 //
