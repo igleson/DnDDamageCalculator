@@ -55,7 +55,7 @@ public record AttackResult(
         return HashCode.Combine(LastAttackIsHit, DamageDices, DamageModifier, AttackEffects);
     }
 
-    private sealed class SimilatAttackResultComparer : IEqualityComparer<AttackResult>
+    private sealed class SimilarAttackResultComparer : IEqualityComparer<AttackResult>
     {
         public bool Equals(AttackResult x, AttackResult y)
         {
@@ -68,7 +68,7 @@ public record AttackResult(
         }
     }
 
-    public static IEqualityComparer<AttackResult> SimilarResultComparer { get; } = new SimilatAttackResultComparer();
+    public static IEqualityComparer<AttackResult> SimilarResultComparer { get; } = new SimilarAttackResultComparer();
 }
 
 public enum HitResult
