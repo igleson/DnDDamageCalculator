@@ -10,7 +10,7 @@ public record AttackResult(
     double Probability,
     AttackEffects AttackEffects)
 {
-    public static readonly AttackResult Initial = new(HitResult.NonAttack, DamageDices.Empty, 0, 1, new AttackEffects());
+    public static readonly AttackResult Initial = new(HitResult.Miss, DamageDices.Empty, 0, 1, new AttackEffects());
 
     public readonly bool LastAttackIsHit =
         LastWas is HitResult.Hit or HitResult.CriticalHit;
@@ -55,7 +55,7 @@ public record AttackResult(
         return HashCode.Combine(LastAttackIsHit, DamageDices, DamageModifier, AttackEffects);
     }
 
-    private sealed class SimilarAttackResultComparer : IEqualityComparer<AttackResult>
+    private sealed class SameAttackResultComparer : IEqualityComparer<AttackResult>
     {
         public bool Equals(AttackResult x, AttackResult y)
         {
@@ -68,15 +68,29 @@ public record AttackResult(
         }
     }
 
-    public static IEqualityComparer<AttackResult> SimilarResultComparer { get; } = new SimilarAttackResultComparer();
+    private sealed class SameDamageAttackResultComparer : IEqualityComparer<AttackResult>
+    {
+        public bool Equals(AttackResult x, AttackResult y)
+        {
+            return x.DamageDices.Equals(y.DamageDices)
+                   && x.DamageModifier == y.DamageModifier;
+        }
+
+        public int GetHashCode(AttackResult obj)
+        {
+            return HashCode.Combine(obj.DamageDices, obj.DamageModifier);;
+        }
+    }
+    
+    public static IEqualityComparer<AttackResult> SameResultComparer { get; } = new SameAttackResultComparer();
+    public static IEqualityComparer<AttackResult> SameDamageComparer { get; } = new SameDamageAttackResultComparer();
 }
 
 public enum HitResult
 {
     Miss,
     Hit,
-    CriticalHit,
-    NonAttack
+    CriticalHit
 }
 
 public record AttackEffects
@@ -88,6 +102,8 @@ public record AttackEffects
     public bool ShieldMasterUsed { get; init; }
 
     public bool HeroicWarriorUsed { get; init; }
+    
+    private int HashCode = -1;
 
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
@@ -110,6 +126,13 @@ public record AttackEffects
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Toppled, Vexed, ShieldMasterUsed, HeroicWarriorUsed);
+        if (HashCode != -1) return HashCode;
+        HashCode = 0;
+        if (Toppled) HashCode |= 1 << 0;
+        if (Vexed) HashCode |= 1 << 1;
+        if (ShieldMasterUsed) HashCode |= 1 << 2;
+        if (HeroicWarriorUsed) HashCode |= 1 << 3;
+        
+        return HashCode;
     }
 }

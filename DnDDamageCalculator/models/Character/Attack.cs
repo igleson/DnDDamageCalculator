@@ -17,8 +17,11 @@ public record Attack(
     {
         var (missResults, hitResults, critResult) = ProcessBasicAttack(combatConfiguration);
 
-        return missResults.Concat(critResult).Concat(hitResults)
-            .SelectMany(result => ProcessFeatures(result, features, combatConfiguration)).AggregateSimilar();
+        return missResults
+            .Concat(critResult)
+            .Concat(hitResults)
+            .AggregateSimilarResult()
+            .SelectMany(result => ProcessFeatures(result, features, combatConfiguration));
     }
 
     private (IEnumerable<AttackResult> missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult>
@@ -68,27 +71,24 @@ public record Attack(
             }
         }
 
+        var nonAttackResult = new AttackResult(HitResult.Miss, DamageDices.Empty, 0,
+            (1 - AttackPerc),
+            combatConfiguration.Effects);
+
         List<AttackResult> missResults =
         [
             new AttackResult(HitResult.Miss, DamageDices.Empty, CalculateMissDamage(Mastery), percToMiss * AttackPerc,
                 combatConfiguration.Effects with { Vexed = false }),
-            new AttackResult(HitResult.NonAttack, DamageDices.Empty, CalculateMissDamage(Mastery), percToMiss * (1 - AttackPerc),
-                combatConfiguration.Effects with { Vexed = false })
+            nonAttackResult
         ];
         var hitResults = GenerateWeaponMasteryResults(
-            new AttackResult(HitResult.Hit, WeaponDamage, DamageMod, percToHit * AttackPerc,
-                new AttackEffects()),
-            Mastery).Concat(
-        [
-            new AttackResult(HitResult.NonAttack, DamageDices.Empty, 0, percToHit * (1 - AttackPerc), new AttackEffects())
-        ]);
+                new AttackResult(HitResult.Hit, WeaponDamage, DamageMod, percToHit * AttackPerc,
+                    new AttackEffects()), Mastery)
+            .AggregateSimilarResult();
         var critResults = GenerateWeaponMasteryResults(
-            new AttackResult(HitResult.CriticalHit, WeaponDamage.Sum(WeaponDamage), DamageMod,
-                percToCrit * AttackPerc, new AttackEffects()), Mastery).Concat(
-        [
-            new AttackResult(HitResult.NonAttack, DamageDices.Empty, 0,
-                percToCrit * (1 - AttackPerc), new AttackEffects())
-        ]);
+                new AttackResult(HitResult.CriticalHit, WeaponDamage.Sum(WeaponDamage), DamageMod,
+                    percToCrit * AttackPerc, new AttackEffects()), Mastery)
+            .AggregateSimilarResult();
         return (
             missResults.Where(result => result.Probability > 0),
             hitResults.Where(result => result.Probability > 0),
@@ -161,7 +161,8 @@ public record Attack(
         if (!features.Any()) return [result];
 
         return features.Aggregate<CharacterFeature, IEnumerable<AttackResult>>([result],
-            (results, feature) => results.SelectMany(res => ProcessFeature(res, feature, combatConfiguration)));
+                (results, feature) => results.SelectMany(res => ProcessFeature(res, feature, combatConfiguration)))
+            .AggregateSimilarResult();
     }
 
     private IEnumerable<AttackResult> ProcessBoonOfCombatProwess(AttackResult result)
@@ -218,7 +219,7 @@ public record Attack(
                     HeroicWarriorUsed = true,
                 }
             }
-        );
+        ).AggregateSimilarResult();
     }
 
     private static IEnumerable<AttackResult> ProcessShieldMasterFeat(AttackResult result, double perc)

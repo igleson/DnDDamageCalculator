@@ -28,7 +28,7 @@ public record CharacterLevel(int LevelNumber, IEnumerable<Attack> Attacks, IList
             );
         }
 
-        return currentScenarios.Select(pair => pair.previousResult).AggregateSimilar();
+        return currentScenarios.Select(pair => pair.previousResult).AggregateSimilarResult();
     }
 
     private static AttackResult AggregateConsecutiveAttacks(

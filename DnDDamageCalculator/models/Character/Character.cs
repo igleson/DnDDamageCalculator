@@ -13,7 +13,7 @@ public struct Character(IEnumerable<CharacterLevel> levels)
             .Select(tuple =>
             {
                 var (combatConfiguration, level) = tuple;
-                return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration).AggregateSimilar());
+                return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration).AggregateSimilarResult());
             });
     }
 }

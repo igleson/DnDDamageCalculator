@@ -1,36 +1,49 @@
 global using Dice = System.Collections.Generic.IEnumerable<(int value, double probability)>;
 using System.Text;
+using Microsoft.AspNetCore.Components.CompilerServices;
 
 namespace DnDDamageCalculator.Utils;
 
-public record DamageDices
+public record DamageDices(IDictionary<int, int> Dies)
 {
-    public static readonly DamageDices Empty = new(Enumerable.Empty<(int quantity, int sides)>());
+    public static readonly DamageDices Empty = new(new Dictionary<int, int>());
 
-    public IEnumerable<(int quantity, int sides)> Dies { get; }
+    public IDictionary<int, int> Dies { get; } = Dies;
 
-    public DamageDices(IEnumerable<(int quantity, int sides)> dies)
-    {
-        Dies = dies.OrderBy(die => die.sides);
-    }
-    
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
         // stringBuilder.Append($"HitHistory = [{string.Join(',', HitHistory.Select(hit => hit.ToString()))}], ");
         // stringBuilder.Append($"EnemyEffects = {EnemyEffects}");
         stringBuilder.Append('[');
-        stringBuilder.Append($"{string.Join('+', Dies.Select(die => $"{die.quantity}d{die.sides}"))}");
+        stringBuilder.Append($"{string.Join('+', Dies.Select(die => $"{die.Value}d{die.Key}"))}");
         stringBuilder.Append(']');
-        
+
         return true;
     }
 
     public DamageDices Sum(DamageDices otherDice)
     {
-        var dies = Dies.Concat(otherDice.Dies);
 
-        return new DamageDices(dies.GroupBy(die => die.sides)
-            .Select(group => (group.Select(die => die.quantity).Sum(), group.Key)));
+        var newDies = new Dictionary<int, int>(int.Max(Dies.Count, otherDice.Dies.Count));
+
+        foreach (var die in Dies)
+        {
+            newDies[die.Key] = die.Value;
+        }
+
+        foreach (var die in otherDice.Dies)
+        {
+            if (newDies.TryGetValue(die.Key, out var currentQuantity))
+            {
+                newDies[die.Key] = die.Value + currentQuantity;
+            }
+            else
+            {
+                newDies[die.Key] = die.Value;
+            }
+        }
+
+        return new DamageDices(newDies);
     }
 
     public virtual bool Equals(DamageDices? other)
@@ -38,16 +51,28 @@ public record DamageDices
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        if (Dies.Count() != other.Dies.Count()) return false;
+        if (Dies.Count != other.Dies.Count) return false;
 
-        return Dies.Zip(other.Dies).All(pair =>
-            pair.First.quantity == pair.Second.quantity && pair.First.sides == pair.Second.sides);
-
+        foreach (var die in Dies)
+        {
+            var otherHasDie = other.Dies.TryGetValue(die.Key, out var quantity);
+            if (!otherHasDie) return false;
+            if (quantity != die.Value) return false;
+        }
+        
+        return true;
     }
 
     public override int GetHashCode()
     {
-        return Dies.Aggregate(0, (previous, die) =>  HashCode.Combine(previous,die.quantity, die.sides ));
+        var generator = new HashCode();
+        foreach (var (quantity, sides) in Dies)
+        {
+            generator.Add(quantity);
+            generator.Add(sides);
+        }
+
+        return generator.ToHashCode();
     }
 }
 
