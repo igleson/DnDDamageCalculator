@@ -15,28 +15,12 @@ public record AttackResult(
     public readonly bool LastAttackIsHit =
         LastWas is HitResult.Hit or HitResult.CriticalHit;
 
-    // public string DamageRepresentation()
-    // {
-    //     return $"{string.Join('+', DamageDices.Select(dice => dice.Count()).GroupBy(d => d).Select(pair =>
-    //         $"{pair.Count()}d{pair.Key}"))}+{DamageModifier}";
-    // }
-    //
-    // public double AverageDamage()
-    // {
-    //     var diceAverage = DamageDices.Select(dice =>
-    //     {
-    //         var a = dice.AverageDamage();
-    //         return a;
-    //     }).Sum();
-    //     return (diceAverage + DamageModifier) * Probability;
-    // }
-
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
         stringBuilder.Append($"LastWasHit = {LastAttackIsHit}, ");
         stringBuilder.Append($"Damage = {DamageDices}+{DamageModifier} , ");
         stringBuilder.Append($"AttackEffects = {AttackEffects}, ");
-        stringBuilder.Append($"Probability = {Probability*100}");
+        stringBuilder.Append($"Probability = {Probability * 100}");
         return true;
     }
 
@@ -55,35 +39,10 @@ public record AttackResult(
         return HashCode.Combine(LastAttackIsHit, DamageDices, DamageModifier, AttackEffects);
     }
 
-    private sealed class SameAttackResultComparer : IEqualityComparer<AttackResult>
+    public int GetHashCodeForJustDamage()
     {
-        public bool Equals(AttackResult x, AttackResult y)
-        {
-            return x.Equals(y);
-        }
-
-        public int GetHashCode(AttackResult obj)
-        {
-            return obj.GetHashCode();
-        }
+        return HashCode.Combine(DamageDices, DamageModifier);
     }
-
-    private sealed class SameDamageAttackResultComparer : IEqualityComparer<AttackResult>
-    {
-        public bool Equals(AttackResult x, AttackResult y)
-        {
-            return x.DamageDices.Equals(y.DamageDices)
-                   && x.DamageModifier == y.DamageModifier;
-        }
-
-        public int GetHashCode(AttackResult obj)
-        {
-            return HashCode.Combine(obj.DamageDices, obj.DamageModifier);;
-        }
-    }
-    
-    public static IEqualityComparer<AttackResult> SameResultComparer { get; } = new SameAttackResultComparer();
-    public static IEqualityComparer<AttackResult> SameDamageComparer { get; } = new SameDamageAttackResultComparer();
 }
 
 public enum HitResult
@@ -102,7 +61,7 @@ public record AttackEffects
     public bool ShieldMasterUsed { get; init; }
 
     public bool HeroicWarriorUsed { get; init; }
-    
+
     private int HashCode = -1;
 
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
@@ -120,7 +79,7 @@ public record AttackEffects
         if (ReferenceEquals(this, other)) return true;
         return Toppled == other.Toppled
                && Vexed == other.Vexed
-               && ShieldMasterUsed == other.ShieldMasterUsed 
+               && ShieldMasterUsed == other.ShieldMasterUsed
                && HeroicWarriorUsed == other.HeroicWarriorUsed;
     }
 
@@ -132,7 +91,7 @@ public record AttackEffects
         if (Vexed) HashCode |= 1 << 1;
         if (ShieldMasterUsed) HashCode |= 1 << 2;
         if (HeroicWarriorUsed) HashCode |= 1 << 3;
-        
+
         return HashCode;
     }
 }

@@ -155,12 +155,12 @@ var shilelaghChampion = new Character([
     // lvl8,
     // lvl9,
     // lvl10,
-    lvl11,
+    // lvl11,
     // lvl13,
     // lvl15,
     // lvl17,
     // lvl19,
-    // lvl20
+    lvl20
 ]);
 
 List<CombatConfiguration> combats =
@@ -192,7 +192,7 @@ var resultsByLevel = shilelaghChampion.GenerateResults(combats);
 var prob = 0.0;
 foreach (var (level, results) in resultsByLevel)
 {
-    foreach (var result in results)
+    foreach (var result in results.AggregateSimilarDamage())
     {
         prob += result.Probability;
         Console.WriteLine($"{result}");

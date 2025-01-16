@@ -10,6 +10,8 @@ public record DamageDices(IDictionary<int, int> Dies)
 
     public IDictionary<int, int> Dies { get; } = Dies;
 
+    private int? HashCode = null;
+
     protected virtual bool PrintMembers(StringBuilder stringBuilder)
     {
         // stringBuilder.Append($"HitHistory = [{string.Join(',', HitHistory.Select(hit => hit.ToString()))}], ");
@@ -25,7 +27,7 @@ public record DamageDices(IDictionary<int, int> Dies)
     {
 
         var newDies = new Dictionary<int, int>(int.Max(Dies.Count, otherDice.Dies.Count));
-
+        
         foreach (var die in Dies)
         {
             newDies[die.Key] = die.Value;
@@ -65,6 +67,7 @@ public record DamageDices(IDictionary<int, int> Dies)
 
     public override int GetHashCode()
     {
+        if (HashCode.HasValue) return HashCode.Value;
         var generator = new HashCode();
         foreach (var (quantity, sides) in Dies)
         {
@@ -72,7 +75,8 @@ public record DamageDices(IDictionary<int, int> Dies)
             generator.Add(sides);
         }
 
-        return generator.ToHashCode();
+        HashCode = generator.ToHashCode();
+        return HashCode.Value;
     }
 }
 
