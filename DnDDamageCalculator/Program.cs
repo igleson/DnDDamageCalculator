@@ -191,13 +191,13 @@ var resultsByLevel = shilelaghChampion.GenerateResults(combats);
 
 foreach (var (level, results) in resultsByLevel)
 {
-    var res = results.AggregateSimilarDamage();
+    var res = results.AggregateSimilarDamage().ToList();
     Console.WriteLine($"---level {level}, total prob {res.Select(r => r.Probability).Sum()}---");
     foreach (var result in res)
     {
         Console.WriteLine($"{result}");
     }
-    Console.WriteLine("---------------------------------------------");
+    Console.WriteLine("--------------------------------------------");
 }
 
 
