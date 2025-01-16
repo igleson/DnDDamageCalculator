@@ -28,7 +28,7 @@ public record CharacterLevel(int LevelNumber, IEnumerable<Attack> Attacks, IList
             );
         }
 
-        return currentScenarios.Select(pair => pair.previousResult);
+        return currentScenarios.Select(pair => pair.previousResult).AggregateSimilar();
     }
 
     private static AttackResult AggregateConsecutiveAttacks(
@@ -36,8 +36,8 @@ public record CharacterLevel(int LevelNumber, IEnumerable<Attack> Attacks, IList
         AttackResult scenario2)
     {
         return new AttackResult(
-            HitHistory: scenario1.HitHistory.Concat(scenario2.HitHistory),
-            DamageDices: scenario1.DamageDices.Concat(scenario2.DamageDices),
+            LastWas: scenario2.LastWas,
+            DamageDices: scenario1.DamageDices.Sum(scenario2.DamageDices),
             DamageModifier: scenario1.DamageModifier + scenario2.DamageModifier,
             Probability: scenario1.Probability * scenario2.Probability,
             AttackEffects: AggregateEffects(scenario1.AttackEffects, scenario2.AttackEffects));
@@ -47,8 +47,8 @@ public record CharacterLevel(int LevelNumber, IEnumerable<Attack> Attacks, IList
     {
         return new AttackEffects
         {
-            Toppled = effects1.Toppled.Concat(effects2.Toppled),
-            Vexed = effects1.Vexed.Concat(effects2.Vexed)
+            Toppled = effects2.Toppled,
+            Vexed = effects2.Vexed
         };
     }
 }
@@ -58,3 +58,7 @@ public interface CharacterFeature;
 public record ShieldMasterFeat(double TopplePerc) : CharacterFeature;
 
 public record HeroicWarriorFeature : CharacterFeature;
+
+public record StudiedAttacks: CharacterFeature;
+
+public record BoonOfCombatProwess: CharacterFeature;

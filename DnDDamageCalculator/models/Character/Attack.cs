@@ -5,19 +5,20 @@ namespace DnDDamageCalculator.Models.Character;
 
 public record Attack(
     int AttackMod,
-    IEnumerable<Dice> WeaponDamage,
+    DamageDices WeaponDamage,
     int DamageMod,
     int CritRange,
     double AttackPerc = 1,
     IWeaponMastery? Mastery = null
 )
 {
-    public IEnumerable<AttackResult> GenerateAttackResults(CombatConfiguration combatConfiguration, IList<CharacterFeature> features)
+    public IEnumerable<AttackResult> GenerateAttackResults(CombatConfiguration combatConfiguration,
+        IList<CharacterFeature> features)
     {
         var (missResults, hitResults, critResult) = ProcessBasicAttack(combatConfiguration);
 
         return missResults.Concat(critResult).Concat(hitResults)
-            .SelectMany(result => ProcessFeatures(result, features, combatConfiguration));
+            .SelectMany(result => ProcessFeatures(result, features, combatConfiguration)).AggregateSimilar();
     }
 
     private (IEnumerable<AttackResult> missResults, IEnumerable<AttackResult> hitResults, IEnumerable<AttackResult>
@@ -69,23 +70,23 @@ public record Attack(
 
         List<AttackResult> missResults =
         [
-            new AttackResult([HitResult.Miss], [], CalculateMissDamage(Mastery), percToMiss * AttackPerc,
-                combatConfiguration.Effects with { Vexed = [false] }),
-            new AttackResult([HitResult.NonAttack], [], CalculateMissDamage(Mastery), percToMiss * (1 - AttackPerc),
-                combatConfiguration.Effects with { Vexed = [false] })
+            new AttackResult(HitResult.Miss, DamageDices.Empty, CalculateMissDamage(Mastery), percToMiss * AttackPerc,
+                combatConfiguration.Effects with { Vexed = false }),
+            new AttackResult(HitResult.NonAttack, DamageDices.Empty, CalculateMissDamage(Mastery), percToMiss * (1 - AttackPerc),
+                combatConfiguration.Effects with { Vexed = false })
         ];
         var hitResults = GenerateWeaponMasteryResults(
-            new AttackResult([HitResult.Hit], WeaponDamage, DamageMod, percToHit * AttackPerc,
+            new AttackResult(HitResult.Hit, WeaponDamage, DamageMod, percToHit * AttackPerc,
                 new AttackEffects()),
             Mastery).Concat(
         [
-            new AttackResult([HitResult.NonAttack], [], 0, percToHit * (1 - AttackPerc), new AttackEffects())
+            new AttackResult(HitResult.NonAttack, DamageDices.Empty, 0, percToHit * (1 - AttackPerc), new AttackEffects())
         ]);
         var critResults = GenerateWeaponMasteryResults(
-            new AttackResult([HitResult.CriticalHit], WeaponDamage.Concat(WeaponDamage), DamageMod,
+            new AttackResult(HitResult.CriticalHit, WeaponDamage.Sum(WeaponDamage), DamageMod,
                 percToCrit * AttackPerc, new AttackEffects()), Mastery).Concat(
         [
-            new AttackResult([HitResult.NonAttack], [], 0,
+            new AttackResult(HitResult.NonAttack, DamageDices.Empty, 0,
                 percToCrit * (1 - AttackPerc), new AttackEffects())
         ]);
         return (
@@ -98,8 +99,8 @@ public record Attack(
     private static bool AttackHasAdvantage(CombatConfiguration configuration)
     {
         return configuration.HasAdvantageOnAttacks
-               || configuration.Effects.Toppled.LastOrDefault()
-               || configuration.Effects.Vexed.LastOrDefault();
+               || configuration.Effects.Toppled
+               || configuration.Effects.Vexed;
     }
 
     private static int CalculateMissDamage(IWeaponMastery? mastery)
@@ -122,7 +123,7 @@ public record Attack(
                 result with
                 {
                     Probability = result.Probability * topplePerc,
-                    AttackEffects = result.AttackEffects with { Toppled = [true] }
+                    AttackEffects = result.AttackEffects with { Toppled = true }
                 },
                 result with
                 {
@@ -134,7 +135,7 @@ public record Attack(
                 result with
                 {
                     Probability = result.Probability,
-                    AttackEffects = result.AttackEffects with { Vexed = [true] }
+                    AttackEffects = result.AttackEffects with { Vexed = true }
                 }
             ],
             _ => [result]
@@ -146,9 +147,10 @@ public record Attack(
     {
         return feature switch
         {
-            ShieldMasterFeat { TopplePerc: var perc } =>
-                ProcessShieldMasterFeat(result, perc),
+            ShieldMasterFeat { TopplePerc: var perc } => ProcessShieldMasterFeat(result, perc),
             HeroicWarriorFeature => ProcessHeroicWarriorFeature(result, combatConfiguration),
+            StudiedAttacks => ProcessStudiedAttacksFeature(result),
+            BoonOfCombatProwess => ProcessBoonOfCombatProwess(result),
             _ => [result]
         };
     }
@@ -162,11 +164,37 @@ public record Attack(
             (results, feature) => results.SelectMany(res => ProcessFeature(res, feature, combatConfiguration)));
     }
 
+    private IEnumerable<AttackResult> ProcessBoonOfCombatProwess(AttackResult result)
+    {
+        if (result.LastAttackIsHit) return [result];
+
+        return GenerateWeaponMasteryResults(
+            result with
+            {
+                LastWas = HitResult.Hit,
+                DamageDices = WeaponDamage,
+                DamageModifier = DamageMod
+            },
+            Mastery);
+    }
+
+    private static IEnumerable<AttackResult> ProcessStudiedAttacksFeature(AttackResult result)
+    {
+        if (result.LastAttackIsHit || result.AttackEffects.Vexed) return [result];
+        return
+        [
+            result with
+            {
+                AttackEffects = result.AttackEffects with { Vexed = true }
+            }
+        ];
+    }
+
     private IEnumerable<AttackResult> ProcessHeroicWarriorFeature(AttackResult result,
         CombatConfiguration combatConfiguration)
     {
-        var lastWasHit = result.LastAttackIsHit();
-        var usedHeroicWarrior = result.AttackEffects.HasHeroicWarriorBeenUsed();
+        var lastWasHit = result.LastAttackIsHit;
+        var usedHeroicWarrior = result.AttackEffects.HeroicWarriorUsed;
         if (usedHeroicWarrior || lastWasHit)
         {
             return
@@ -175,7 +203,7 @@ public record Attack(
                 {
                     AttackEffects = result.AttackEffects with
                     {
-                        HeroicWarriorUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([false])
+                        HeroicWarriorUsed = false
                     }
                 }
             ];
@@ -187,7 +215,7 @@ public record Attack(
                 Probability = attackResult.Probability * result.Probability,
                 AttackEffects = attackResult.AttackEffects with
                 {
-                    HeroicWarriorUsedHist = attackResult.AttackEffects.ShieldMasterUsedHist.Concat([true]),
+                    HeroicWarriorUsed = true,
                 }
             }
         );
@@ -195,9 +223,9 @@ public record Attack(
 
     private static IEnumerable<AttackResult> ProcessShieldMasterFeat(AttackResult result, double perc)
     {
-        if (!result.LastAttackIsHit() ||
-            result.AttackEffects.HasShieldMasterBeenUsed() ||
-            result.AttackEffects.EnemyIsCurrentlyToppled())
+        if (!result.LastAttackIsHit ||
+            result.AttackEffects.ShieldMasterUsed ||
+            result.AttackEffects.Toppled)
         {
             return [result];
         }
@@ -209,8 +237,8 @@ public record Attack(
                 Probability = result.Probability * perc,
                 AttackEffects = result.AttackEffects with
                 {
-                    Toppled = result.AttackEffects.Toppled.Concat([true]),
-                    ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
+                    Toppled = true,
+                    ShieldMasterUsed = true
                 }
             },
             result with
@@ -218,8 +246,8 @@ public record Attack(
                 Probability = result.Probability * (1 - perc),
                 AttackEffects = result.AttackEffects with
                 {
-                    Toppled = result.AttackEffects.Toppled.Concat([false]),
-                    ShieldMasterUsedHist = result.AttackEffects.ShieldMasterUsedHist.Concat([true])
+                    Toppled = false,
+                    ShieldMasterUsed = true
                 }
             }
         ];

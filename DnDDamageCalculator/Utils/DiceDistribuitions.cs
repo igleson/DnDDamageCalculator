@@ -1,6 +1,55 @@
 global using Dice = System.Collections.Generic.IEnumerable<(int value, double probability)>;
+using System.Text;
 
 namespace DnDDamageCalculator.Utils;
+
+public record DamageDices
+{
+    public static readonly DamageDices Empty = new(Enumerable.Empty<(int quantity, int sides)>());
+
+    public IEnumerable<(int quantity, int sides)> Dies { get; }
+
+    public DamageDices(IEnumerable<(int quantity, int sides)> dies)
+    {
+        Dies = dies.OrderBy(die => die.sides);
+    }
+    
+    protected virtual bool PrintMembers(StringBuilder stringBuilder)
+    {
+        // stringBuilder.Append($"HitHistory = [{string.Join(',', HitHistory.Select(hit => hit.ToString()))}], ");
+        // stringBuilder.Append($"EnemyEffects = {EnemyEffects}");
+        stringBuilder.Append('[');
+        stringBuilder.Append($"{string.Join('+', Dies.Select(die => $"{die.quantity}d{die.sides}"))}");
+        stringBuilder.Append(']');
+        
+        return true;
+    }
+
+    public DamageDices Sum(DamageDices otherDice)
+    {
+        var dies = Dies.Concat(otherDice.Dies);
+
+        return new DamageDices(dies.GroupBy(die => die.sides)
+            .Select(group => (group.Select(die => die.quantity).Sum(), group.Key)));
+    }
+
+    public virtual bool Equals(DamageDices? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (Dies.Count() != other.Dies.Count()) return false;
+
+        return Dies.Zip(other.Dies).All(pair =>
+            pair.First.quantity == pair.Second.quantity && pair.First.sides == pair.Second.sides);
+
+    }
+
+    public override int GetHashCode()
+    {
+        return Dies.Aggregate(0, (previous, die) =>  HashCode.Combine(previous,die.quantity, die.sides ));
+    }
+}
 
 public static class DiceDistributions
 {
@@ -54,18 +103,18 @@ public static class DiceDistributions
 
     public static readonly Dice D12 =
     [
-        (1, 1.0/12),
-        (2, 1.0/12),
-        (3, 1.0/12),
-        (4, 1.0/12),
-        (5, 1.0/12),
-        (6, 1.0/12),
-        (7, 1.0/12),
-        (8, 1.0/12),
-        (9, 1.0/12),
-        (10, 1.0/12),
-        (11, 1.0/12),
-        (12, 1.0/12)
+        (1, 1.0 / 12),
+        (2, 1.0 / 12),
+        (3, 1.0 / 12),
+        (4, 1.0 / 12),
+        (5, 1.0 / 12),
+        (6, 1.0 / 12),
+        (7, 1.0 / 12),
+        (8, 1.0 / 12),
+        (9, 1.0 / 12),
+        (10, 1.0 / 12),
+        (11, 1.0 / 12),
+        (12, 1.0 / 12)
     ];
 
     public static readonly Dice D10 =
@@ -96,14 +145,14 @@ public static class DiceDistributions
 
     public static readonly Dice D6 =
     [
-        (1, 1.0/6),
-        (2, 1.0/6),
-        (3, 1.0/6),
-        (4, 1.0/6),
-        (5, 1.0/6),
-        (6, 1.0/6)
+        (1, 1.0 / 6),
+        (2, 1.0 / 6),
+        (3, 1.0 / 6),
+        (4, 1.0 / 6),
+        (5, 1.0 / 6),
+        (6, 1.0 / 6)
     ];
-    
+
     public static readonly Dice D4 =
     [
         (1, 0.25),
@@ -116,11 +165,12 @@ public static class DiceDistributions
     {
         return die.Select(dice => dice.value * dice.probability).Sum();
     }
-    
+
     public static string DiesString(this IEnumerable<Dice> dies)
     {
         var groupedBySides = dies.GroupBy(die => die.Count());
 
-        return string.Join('+', groupedBySides.OrderBy(group => group.Key).Select(group => $"{group.Count()}d{group.Key}"));
+        return string.Join('+',
+            groupedBySides.OrderBy(group => group.Key).Select(group => $"{group.Count()}d{group.Key}"));
     }
 }

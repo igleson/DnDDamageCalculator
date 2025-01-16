@@ -1,4 +1,5 @@
 using DnDDamageCalculator.Models.Combat;
+using DnDDamageCalculator.Utils;
 
 namespace DnDDamageCalculator.Models.Character;
 
@@ -12,7 +13,7 @@ public struct Character(IEnumerable<CharacterLevel> levels)
             .Select(tuple =>
             {
                 var (combatConfiguration, level) = tuple;
-                return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration));
+                return (levelNumber: level.LevelNumber, level.GenerateResults(combatConfiguration).AggregateSimilar());
             });
     }
 }
